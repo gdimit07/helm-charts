@@ -3,14 +3,15 @@ kind: Deployment
 metadata:
   name: {{ include "notejam.fullname" . }}
   labels:
-    {{- include "notejam.labels" . | nindent 4 }}
+    app: {{ .Values.notejam.name }}
+    #{{- include "notejam.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "notejam.selectorLabels" . | nindent 6 }}
+      app: {{ .Values.notejam.name }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,7 +19,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "notejam.selectorLabels" . | nindent 8 }}
+        app: {{ .Values.notejam.name }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -34,17 +35,13 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: 80
+            - name: readiness-port
+              containerPort: 8080
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
           readinessProbe:
             httpGet:
-              path: /
-              port: http
+              path: /signin
+              port: readiness-port
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
