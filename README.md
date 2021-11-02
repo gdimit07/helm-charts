@@ -1,5 +1,8 @@
-# helm-charts
+# Helm-charts
 
-This is a Helm chart for the Notejam web application.
+## This is a simple Helm chart for the Notejam web application.
 
-It includes
+### It includes the following resources:
+- Deployment
+- Service (NodePort)
+- Horizontal pod autoscaler
